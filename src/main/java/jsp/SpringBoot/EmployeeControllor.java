@@ -73,7 +73,7 @@ public class EmployeeControllor {
 	}
 	
 //	delete the info by id
-	@DeleteMapping("/employee/{id}")
+	@DeleteMapping("/employee/{eid}")
 	public ResponseEntity<ResponseStructure<Employee>> deleteEmployeeById(@PathVariable int id) {
 		Optional<Employee> opt = er.findById(id);
 		ResponseStructure<Employee> str = new ResponseStructure<Employee>();
@@ -88,6 +88,26 @@ public class EmployeeControllor {
 			
 		}else {
 			throw new IdNotFoundException();
-		}	
+		}
+	}
+		
+//		find by name of the employee
+		@GetMapping("/employees/{ename}")
+		public ResponseEntity<ResponseStructure<List<Employee>>> getEmployeeByName(@PathVariable String ename){
+			ResponseStructure<List<Employee>> str = new ResponseStructure<List<Employee>>();
+			List<Employee> emp = er.findByEname(ename);
+			
+			if(emp.isEmpty()) {
+				str.setStatusCode(HttpStatus.NOT_FOUND.value());
+				str.setMessage("Name not Found");
+				str.setData(null);
+				return new ResponseEntity<ResponseStructure<List<Employee>>>(str, HttpStatus.NOT_FOUND);
+		    }else {
+			    str.setStatusCode(HttpStatus.OK.value());
+			    str.setMessage("Success");
+			    str.setData(emp);
+			    return new ResponseEntity<ResponseStructure<List<Employee>>>(str, HttpStatus.OK);
+		}
+		
 	}
 }
