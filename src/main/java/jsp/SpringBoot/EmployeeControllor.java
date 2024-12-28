@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,58 +24,70 @@ public class EmployeeControllor {
 	
 //	Insert all the info
 	@PostMapping("/employee")
-	public ResponseStructure<Employee> saveEmployee(@RequestBody Employee e){
+	public ResponseEntity<ResponseStructure<Employee>> saveEmployee(@RequestBody Employee e){
 		er.save(e);
 		ResponseStructure<Employee> str=new ResponseStructure<Employee>();
-		str.setStatusCode(HttpStatus.CREATED.value());
+		str.setStatusCode(HttpStatus.CREATED.value()); //201 created
 		str.setMessage("Success");
 		str.setData(e);
-		return str;
+		return new ResponseEntity<ResponseStructure<Employee>>(str, HttpStatus.CREATED);
 	}
 	
 //	get all the info
 	@GetMapping("/employee")
-	public ResponseStructure<List<Employee>> getAllEmployees(){
+	public ResponseEntity<ResponseStructure<List<Employee>>> getAllEmployees(){
 		List<Employee> e = er.findAll();
 		ResponseStructure<List<Employee>> str= new ResponseStructure<List<Employee>>();
 		str.setStatusCode(HttpStatus.OK.value());
 		str.setMessage("Success");
 		str.setData(e);
-		return str;
+		return new ResponseEntity<ResponseStructure<List<Employee>>>(str, HttpStatus.OK);
 	}
 	
 //	get info by employee id
 	@GetMapping("/employee/{id}")
-	public Employee getEmployeeById(@PathVariable int id) {
+	public ResponseEntity<ResponseStructure<Employee>> getEmployeeById(@PathVariable int id) {
 		Optional<Employee> opt = er.findById(id);
+		ResponseStructure<Employee> str = new ResponseStructure<Employee>();
 		
 		if(opt.isPresent()) {
-			return opt.get();
-			
+			str.setStatusCode(HttpStatus.OK.value());
+			str.setMessage("Success");
+			str.setData(opt.get());
+			return new ResponseEntity<ResponseStructure<Employee>>(str, HttpStatus.OK);
 		}else {
-			return null;
+			throw new IdNotFoundException();
 		}
  	}
 
 //	update the info
 	@PutMapping("/employee")
-	public String updateEmployee(@RequestBody Employee e) {
+	public ResponseEntity<ResponseStructure<Employee>> updateEmployee(@RequestBody Employee e) {
 		er.save(e);
-		return "Employee record updated";
+		ResponseStructure<Employee> str = new ResponseStructure<Employee>();
+		
+		str.setStatusCode(HttpStatus.OK.value());
+		str.setMessage("Success");
+		str.setData(e);
+		return new ResponseEntity<ResponseStructure<Employee>>(str, HttpStatus.OK);
 	}
 	
 //	delete the info by id
 	@DeleteMapping("/employee/{id}")
-	public String deleteEmployeeById(@PathVariable int id) {
+	public ResponseEntity<ResponseStructure<Employee>> deleteEmployeeById(@PathVariable int id) {
 		Optional<Employee> opt = er.findById(id);
-		if(opt.isPresent()) {
-			er.delete(opt.get());
-			return "Employee record is delete";
-		}else {
-			return "No record delete";
-		}
+		ResponseStructure<Employee> str = new ResponseStructure<Employee>();
 		
+		if(opt.isPresent()) {
+			Employee e = opt.get();
+			er.delete(e);
+			str.setStatusCode(HttpStatus.OK.value());
+			str.setMessage("Deleted");
+			str.setData(null);
+			return new ResponseEntity<ResponseStructure<Employee>>(str, HttpStatus.OK);
+			
+		}else {
+			throw new IdNotFoundException();
+		}	
 	}
-
-
 }
