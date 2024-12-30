@@ -110,4 +110,58 @@ public class EmployeeControllor {
 		}
 		
 	}
+	@GetMapping("/employees")
+	public ResponseEntity<ResponseStructure<List<Employee>>> getEmployeeByEsalary() {
+		ResponseStructure<List<Employee>> str = new ResponseStructure<List<Employee>>();
+		List<Employee> emp = er.getEmployeeByEsalary();
+			
+		if(!emp.isEmpty()) {
+			str.setStatusCode(HttpStatus.OK.value());
+			str.setMessage("Success");
+			str.setData(emp);
+			return new ResponseEntity<ResponseStructure<List<Employee>>>(str, HttpStatus.OK);
+		} else {
+			str.setStatusCode(HttpStatus.NOT_FOUND.value());
+		    str.setMessage("salary not find");
+		    str.setData(null);
+		    return new ResponseEntity<ResponseStructure<List<Employee>>>(str, HttpStatus.NOT_FOUND);
+			}
+	 	}
+		
+	@GetMapping("/employees/{eid}/{ename}")
+	public ResponseEntity<ResponseStructure<List<Employee>>> getEmployeeByIdAndName(@PathVariable int eid,@PathVariable String ename) {
+		ResponseStructure<List<Employee>> str = new ResponseStructure<List<Employee>>();
+		List<Employee> emp = er.getEmployeeByIdAndName(eid,ename);
+			
+		if(!emp.isEmpty()) {
+			str.setStatusCode(HttpStatus.OK.value());
+			str.setMessage("Success");
+			str.setData(emp);
+			return new ResponseEntity<ResponseStructure<List<Employee>>>(str, HttpStatus.OK);
+		} else {
+			str.setStatusCode(HttpStatus.NOT_FOUND.value());
+		    str.setMessage("not find");
+		    str.setData(null);
+		    return new ResponseEntity<ResponseStructure<List<Employee>>>(str, HttpStatus.NOT_FOUND);
+			}
+	 	}
+	
+	@GetMapping("/Employees/{ename}")
+	public ResponseEntity<ResponseStructure<List<Employee>>> getEmployeeEname(@PathVariable String ename){
+		ResponseStructure<List<Employee>> str = new ResponseStructure<List<Employee>>();
+		List<Employee> e = er.getEmployeeByEname(ename);
+		
+		if(!e.isEmpty()) {
+			str.setStatusCode(HttpStatus.OK.value());
+			str.setMessage("Success");
+			str.setData(e);
+			return new ResponseEntity<ResponseStructure<List<Employee>>>(str,HttpStatus.OK);
+		}
+		else {
+			str.setStatusCode(HttpStatus.NOT_FOUND.value());
+			str.setMessage("Not found");
+			str.setData(null);
+			return new ResponseEntity<ResponseStructure<List<Employee>>>(str,HttpStatus.NOT_FOUND);
+		}
+	}
 }
